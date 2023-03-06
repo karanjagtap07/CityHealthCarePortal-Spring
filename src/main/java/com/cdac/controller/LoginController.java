@@ -3,6 +3,7 @@ package com.cdac.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cdac.dto.Loginemail;
 import com.cdac.dto.Loginreq;
 import com.cdac.entity.Doctorinfo;
 import com.cdac.entity.Hospital;
@@ -26,25 +28,33 @@ public class LoginController {
 
 	@Autowired
 	LoginServiceIntf loginService;
-	
+
 	@PostMapping("/userlogin")
-	public ResponseEntity<?> authenticateUser(@RequestBody Loginreq loginreq){
-		return ResponseEntity.ok(loginService.authenticateUser(loginreq.getEmail(),loginreq.getPassword()));
+	public ResponseEntity<?> authenticateUser(@RequestBody Loginreq loginreq) {
+		return ResponseEntity.ok(loginService.authenticateUser(loginreq.getEmail(), loginreq.getPassword()));
 	}
-	
-	
+
 	@PostMapping("/generateotp/{email}")
-	private ResponseEntity<String> generateOtp(@PathVariable String email) {
+	private ResponseEntity<?> generateOtp(@PathVariable String email) {
 		loginService.generateOtp(email);
-		return new ResponseEntity<>("Sent OTP",HttpStatus.OK); 
-		
+		return ResponseEntity.ok(loginService.generateOtp(email));
+		//return new ResponseEntity<>("Sent OTP", HttpStatus.OK);
+
 	}
-	
-	//forget password 
-	/*
-	 * @PutMapping("/forgotpassword/{email}/{otp}") private ResponseEntity<String>
-	 * forgotPassword(@PathVariable String email,@PathVariable String otp) {
-	 * 
-	 * return new ResponseEntity<>("PASSWORD UPDATED",HttpStatus.OK); }
-	 */
-} 
+
+	@PostMapping("/verifyotp/{uotp}")
+	private ResponseEntity<String> verifyOtp(@PathVariable String uotp) {
+		System.out.println(uotp);
+		loginService.verifyOtp(uotp);
+		return new ResponseEntity<>("OTP Verified", HttpStatus.OK);
+
+	}
+
+	@PutMapping("/changepassword/{password}/{e}")
+	private ResponseEntity<String> changePassword(@PathVariable String password,@PathVariable String e) {
+		loginService.updatePassword(password, e);
+		System.out.println(password+" "+e);
+		return new ResponseEntity<>("Password Changed", HttpStatus.OK);
+	}
+
+}

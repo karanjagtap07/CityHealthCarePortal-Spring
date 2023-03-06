@@ -23,6 +23,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 	@Query("select email from User u where u.email=:email")
 	String findEmail(String email);
 	
+	@Transactional
 	@Modifying
 	@Query("update User u set  u.password=:password where u.email=:email")
 	void updatePassword(String password,String email);
